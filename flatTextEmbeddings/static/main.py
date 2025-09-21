@@ -4,9 +4,9 @@ from sklearn.metrics.pairwise import euclidean_distances
 import numpy as np
 import faiss
 
-# sentences = ["pet", "wild animal", "feline", "canine", "domestic animal"]
-
-sentences = ["car", "building", "computer"]
+sentences = ["pet", "wild animal", "feline", "canine", "domestic animal"]
+#
+# sentences = ["car", "building", "computer"]
 model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 embeddings = model.encode(sentences)
 print(embeddings) #this generates 384d embeddings for each sentence
@@ -63,6 +63,7 @@ print("Euclidean distance metrics using Faiss Index: ")
 euclidean_index = faiss.IndexFlatL2(dimensions)
 euclidean_index.add(embeddings_np)
 query2 = model.encode(["animal"]).astype('float32')
+faiss.normalize_L2(query2)
 
 distances, indices = euclidean_index.search(query2, k=4)
 euclidean_distance_threshold = 0.7
