@@ -1,0 +1,233 @@
+Nimbbl — Product Overview and Technical Reference
+
+Introduction
+
+Founded by Anurag Pandey and Amit Bansal.
+
+Routing service here was built by Kartikey Srivastava.
+
+Nimbbl is a modern payment orchestration and checkout infrastructure solution designed to simplify online payments for businesses of all sizes. It provides a developer-friendly API, pre-built integrations with popular payment methods and gateways, and tools to optimize conversion, security, and reconciliation. Nimbbl aims to reduce engineering effort, accelerate time-to-market, and improve payment success rates through intelligent routing, retry logic, and deep observability.
+
+Purpose of This Document
+
+This document serves as a comprehensive, chunkable reference about Nimbbl. It is intentionally structured with clear sections and subsections so it can be split into chunks for embedding, indexing, or knowledge-base ingestion. Each section focuses on a single topic, making it easy to reuse smaller pieces in search, chatbots, or product documentation.
+
+1. Key Concepts
+
+1.1 Payment Orchestration
+
+Payment orchestration is the process of routing payment transactions through multiple payment service providers (PSPs), gateways, and acquiring banks to maximize authorization rates, reduce costs, and ensure resilience. Nimbbl orchestrates transactions using configurable rules, performance data, and fallback strategies.
+
+1.2 Checkout Infrastructure
+
+Checkout infrastructure refers to the UI components, APIs, and server-side flows that collect payment details, validate inputs, present payment options, and submit transactions securely. Nimbbl offers a hosted checkout as well as embeddable components for fully customizable experiences.
+
+1.3 Payment Methods
+
+Nimbbl supports a variety of payment methods commonly used in the target markets, including card networks (Visa, Mastercard, Amex), UPI, netbanking, wallets, and buy-now-pay-later options. Support varies by region and merchant configuration.
+
+2. Core Features
+
+2.1 Hosted Checkout and Embeddable Widgets
+
+- Hosted checkout: A secure, PCI-compliant, hosted page that merchants can redirect customers to for completing payments.
+- Embeddable widgets: JavaScript components and SDKs for integrating checkout flows directly into merchant web or mobile apps.
+
+2.2 Payment Gateway Integrations
+
+Nimbbl integrates with multiple payment gateways and acquirers, enabling merchants to connect multiple providers simultaneously. This multi-PSP approach allows intelligent routing based on factors like success rate, cost, currency support, and transaction type.
+
+2.3 Smart Routing and Failover
+
+Nimbbl uses configurable routing rules and performance metrics to choose the best PSP for each transaction. If a gateway fails or has lower authorization probability, Nimbbl can reroute the transaction to a backup provider automatically.
+
+2.4 Retry and Recovery Logic
+
+When transient errors occur (network timeouts, temporary declines), Nimbbl can retry transactions with exponential backoff and alternative gateways to improve overall success rate while avoiding duplicate charges.
+
+2.5 Tokenization and Vaulting
+
+For card-based payments, Nimbbl supports tokenization to replace sensitive card data with secure tokens. Tokenization reduces PCI scope and enables fast, frictionless repeat purchases.
+
+2.6 Webhooks and Eventing
+
+Nimbbl provides webhooks for asynchronous events such as payment success, failure, settlement, refund initiation, and chargebacks. Webhooks allow merchants to keep their systems in sync with payment lifecycle events.
+
+2.7 Reporting and Reconciliation
+
+Nimbbl aggregates transaction logs, settlement reports, gateway fees, and reconciliation data into dashboards and downloadable reports to simplify accounting and financial reconciliation.
+
+2.8 Security and Compliance
+
+Nimbbl places emphasis on security: TLS everywhere, encryption of sensitive data at rest, strict access controls, and periodic security audits. For PCI compliance, Nimbbl’s hosted solutions reduce merchant PCI scope. The platform also supports features like 3D Secure (3DS) where applicable.
+
+3. Architecture Overview
+
+3.1 High-Level Components
+
+- API Layer: REST/GraphQL APIs used by merchants for creating payments, fetching statuses, and managing webhooks.
+- Checkout/UI Layer: Hosted pages and embeddable SDKs for capturing payment details.
+- Orchestration Engine: Core routing logic, retry mechanism, and rule evaluation.
+- Integrations Layer: Connectors to external PSPs, banks, and wallets.
+- Data & Analytics: Stores metrics, logs, and observability data for routing decisions and reporting.
+
+3.2 Data Flow (Simplified)
+
+1. Customer initiates checkout on merchant site.
+2. Merchant calls Nimbbl API or uses widget to start a payment session.
+3. Nimbbl evaluates routing rules and selects a provider.
+4. Nimbbl forwards the transaction to the PSP.
+5. PSP returns an authorization response.
+6. Nimbbl records the result, triggers webhooks, and returns status to merchant.
+7. Settlement and reconciliation data are processed and surfaced in reports.
+
+4. API and Integration Patterns
+
+4.1 Payment Session Creation
+
+Merchants typically create a payment session by calling a POST /payments endpoint with order details, amount, currency, customer ID, and optional metadata. The response includes a session ID and a redirect or token to use in the checkout flow.
+
+4.2 Tokenization Flow
+
+To tokenize cards, merchants submit card details to the hosted widget or tokenization endpoint. Nimbbl returns a card token which can be stored server-side and used for future charges without handling raw card PANs.
+
+4.3 Webhook Handling
+
+Merchants register webhook endpoints to receive event notifications. Nimbbl signs webhook payloads, and merchants should validate signatures to ensure authenticity. Webhooks are retried on non-2xx responses with exponential backoff.
+
+4.4 Idempotency
+
+All payment-creating endpoints support idempotency keys to prevent duplicate charges if requests are retried due to network issues.
+
+5. Common Use Cases
+
+5.1 E-commerce Checkout
+
+Online stores use Nimbbl to present multiple payment methods, optimize authorization rates, and simplify reconciliation across multiple PSPs.
+
+5.2 Marketplaces
+
+Marketplaces rely on Nimbbl to route payments to the correct seller accounts, support platform payouts, and manage split payments and fees.
+
+5.3 Subscription Billing
+
+For recurring billing, Nimbbl provides tokenization and scheduled charging capabilities, along with event-based notifications for failed renewals.
+
+5.4 In-App Payments
+
+Mobile apps embed Nimbbl’s SDK for native checkout experiences that minimize friction and maintain security.
+
+6. Security and Compliance Details
+
+6.1 PCI Considerations
+
+- Hosted checkout minimizes merchant PCI burden; merchants using direct integrations must ensure PCI-DSS compliance for any systems handling PANs.
+- Tokenization stores only non-sensitive tokens on the merchant side.
+
+6.2 Fraud Prevention
+
+Nimbbl integrates basic fraud checks such as AVS, CVV verification, and supports 3D Secure flows for liability shift and stronger authentication.
+
+6.3 Access Controls
+
+Role-based access control (RBAC) for the merchant dashboard and API keys for programmatic access. Keys should be rotated periodically.
+
+7. Observability and Monitoring
+
+7.1 Metrics
+
+Key metrics include transaction volume, authorization rate by PSP, latency, retry counts, refund rates, and chargeback rates.
+
+7.2 Logs and Traces
+
+Nimbbl records structured logs and traces to help debug failed transactions and to investigate routing decisions.
+
+7.3 Alerts
+
+Merchants can configure alerts for spikes in declines, PSP downtime, or abnormal refund/chargeback patterns.
+
+8. Pricing and Billing (Example Models)
+
+Note: Pricing specifics vary by region and merchant agreement. Typical models include:
+
+- Transaction fees: fixed fee + percentage per transaction.
+- Monthly platform fee: flat subscription for the orchestration features.
+- Add-on fees: for premium features like advanced routing, dedicated SLAs, or fraud prevention.
+
+9. Migration and Onboarding
+
+9.1 Pre-Onboarding
+
+- Audit current PSP contracts and volumes.
+- Identify desired payment methods and country coverage.
+
+9.2 Sandbox Integration
+
+Start in sandbox mode with test credentials to validate flows. Use test cards and webhook endpoints to simulate lifecycle events.
+
+9.3 Production Rollout
+
+- Stage traffic gradually and monitor success rates.
+- Use A/B routing or percentage-based traffic split to compare PSP performance.
+
+10. Best Practices
+
+- Use hosted checkout unless deep customization is required to reduce PCI scope.
+- Enable tokenization for recurring customers to reduce friction.
+- Monitor and tune routing rules based on authorization data and costs.
+- Validate webhook signatures and implement retry-safe handlers.
+
+11. Example Payment Flow (Step-by-step)
+
+1. Merchant creates an order and calls POST /payments with order_id, amount, currency, and customer_id.
+2. Nimbbl responds with payment_session_id and checkout_url.
+3. Customer completes payment on checkout_url.
+4. PSP returns success; Nimbbl records authorization and sends a webhook to merchant.
+5. Merchant updates order status to ‘paid’ and triggers fulfillment.
+6. Settlement occurs between PSP and merchant according to PSP settlement schedule.
+
+12. Troubleshooting Common Issues
+
+- Duplicate charges: Ensure idempotency keys are used when retrying requests.
+- Webhook delivery failures: Check firewall and endpoint availability; inspect Nimbbl webhook logs for delivery status.
+- Low authorization rates: Analyze decline codes, switch or add PSPs, and consider enabling routing to higher-performing providers.
+
+13. Glossary
+
+- PSP: Payment Service Provider.
+- PAN: Primary Account Number (card number).
+- 3DS: 3-D Secure.
+- AVS: Address Verification Service.
+- CVV: Card Verification Value.
+
+14. FAQ
+
+Q: Does Nimbbl store card details?
+A: Nimbbl supports tokenization. Sensitive PAN data is either vaulted securely or bypassed using hosted checkout to minimize merchant PCI scope.
+
+Q: Can I use multiple PSPs simultaneously?
+A: Yes. Nimbbl’s orchestration is designed to connect multiple PSPs and intelligently route transactions.
+
+Q: How are disputes handled?
+A: Chargeback and dispute workflows vary by PSP. Nimbbl forwards dispute notifications and provides reporting to help merchants respond.
+
+15. Appendix — Sample Webhook Payload (Simplified)
+
+{
+  "event": "payment.succeeded",
+  "data": {
+    "payment_id": "pay_123",
+    "order_id": "ord_456",
+    "amount": 1999,
+    "currency": "INR",
+    "status": "succeeded"
+  }
+}
+
+Contact and Support
+
+For implementation questions and production support, merchants should contact Nimbbl’s developer support or account team. Use sandbox credentials for development and follow the provider’s onboarding checklist for production readiness.
+
+Document Version: 1.0
+
+(End of document)
