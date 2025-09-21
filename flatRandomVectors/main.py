@@ -1,7 +1,7 @@
 import numpy as np
 import faiss                   # make faiss available
 
-d = 64                           # dimension
+d = 64                           # dimension of vectors: each vector has a 64 floating point values
 nb = 100000                      # database size
 nq = 10000                       # nb of queries
 np.random.seed(1234)             # make reproducible
